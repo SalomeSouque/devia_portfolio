@@ -1,0 +1,2 @@
+pense bete : 
+La note résume l'essentiel. Un point à ne pas oublier pour la suite : la table education dans ton schéma actuel n'a pas de table de traductions (education_translations). C'est la prochaine migration à créer si tu veux que les intitulés de diplômes soient bilingues — exactement le genre de chose qu'on gère avec un fichier 002_add_education_translations.sql plutôt qu'en touchant au schéma initial.

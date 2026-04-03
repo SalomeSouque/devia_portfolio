@@ -1,0 +1,107 @@
+
+<style>
+  .note { font-family: var(--font-sans); padding: 1.5rem 0; max-width: 720px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #EEEDFE; color: #3C3489; margin-bottom: 1rem; letter-spacing: 0.06em; }
+  .note h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 0.25rem; }
+  .note .subtitle { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 1.75rem; }
+  .section { margin-bottom: 1.5rem; }
+  .section-title { font-size: 12px; font-weight: 500; color: #3C3489; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.5rem; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .card p, .card li { font-size: 14px; line-height: 1.65; color: var(--color-text-primary); margin: 0; }
+  .card ul { padding-left: 1.25rem; margin: 0; }
+  .card li { margin-bottom: 0.35rem; }
+  .card li:last-child { margin-bottom: 0; }
+  .highlight { background: #EEEDFE; border: 0.5px solid #AFA9EC; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .highlight p { font-size: 14px; line-height: 1.65; color: #26215C; margin: 0; }
+  .code-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 12.5px; color: var(--color-text-primary); line-height: 1.6; margin: 0; overflow-x: auto; }
+  .code-block .comment { color: var(--color-text-secondary); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .mini-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+  .mini-card .label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 0.25rem; }
+  .mini-card p { font-size: 13px; color: var(--color-text-primary); margin: 0; line-height: 1.5; }
+  .warning { background: #FAEEDA; border: 0.5px solid #EF9F27; border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+  .warning p { font-size: 13px; color: #412402; margin: 0; line-height: 1.6; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.5rem 0; }
+</style>
+
+<div class="note">
+  <span class="tag">Note de cours</span>
+  <h1>Migrations de base de données avec node-pg-migrate</h1>
+  <p class="subtitle">Pourquoi les migrations vivent dans <code>migrations/</code> à la racine — et comment penser les évolutions de schéma</p>
+
+  <div class="section">
+    <div class="section-title">Le concept essentiel</div>
+    <div class="card">
+      <p>Un fichier de migration = une modification versionnée de ta base. Chaque fichier s'applique <strong>une fois</strong>, dans l'ordre. <code>node-pg-migrate</code> mémorise lesquels ont déjà été joués dans une table <code>pgmigrations</code> qu'il gère tout seul.</p>
+      <br>
+      <p>Au lieu de modifier <code>schema.sql</code> à la main et de tout réappliquer, tu crées un nouveau fichier numéroté à chaque évolution. L'historique des changements est préservé.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Pourquoi à la racine ?</div>
+    <div class="row">
+      <div class="mini-card">
+        <p class="label">Convention outil</p>
+        <p>node-pg-migrate cherche <code>./migrations/</code> par défaut. Respecter ce défaut évite de configurer un chemin custom.</p>
+      </div>
+      <div class="mini-card">
+        <p class="label">Séparation des responsabilités</p>
+        <p>Les migrations ne sont pas du code React. Elles n'appartiennent pas à <code>src/</code>, comme le <code>Dockerfile</code> n'y est pas non plus.</p>
+      </div>
+      <div class="mini-card">
+        <p class="label">Lisibilité projet</p>
+        <p>Tout dev qui ouvre le dépôt sait immédiatement où chercher l'historique de la base.</p>
+      </div>
+      <div class="mini-card">
+        <p class="label">Cohérence écosystème</p>
+        <p>C'est la convention de tous les outils de migration Node.js (db-migrate, Flyway, etc.).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">À quoi ressemble le dossier</div>
+    <pre class="code-block">migrations/
+  001_initial_schema.sql        <span class="comment"># ton schema.sql converti</span>
+  002_add_education_translations.sql  <span class="comment"># correction i18n</span>
+  003_add_alt_text_index.sql    <span class="comment"># optimisation</span>
+  004_add_photos_category.sql   <span class="comment"># nouvelle feature</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-title">La règle d'or — à retenir absolument</div>
+    <div class="highlight">
+      <p>On ne modifie <strong>jamais</strong> un fichier de migration déjà appliqué en production. Si tu as oublié un champ dans <code>002_...</code>, tu crées <code>005_add_missing_field.sql</code>. Ce principe garantit que n'importe quel serveur peut rejouer l'historique complet et arriver au même état.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title">Ce que ça change pour ton projet</div>
+    <div class="card">
+      <ul>
+        <li>Ton <code>schema.sql</code> actuel sert uniquement en développement local, via <code>reset.sql → schema.sql → seed.sql</code>.</li>
+        <li>Avant le déploiement en production, convertir <code>schema.sql</code> en <code>migrations/001_initial_schema.sql</code>.</li>
+        <li>La première évolution à prévoir : <code>002_add_education_translations.sql</code> — la table <code>education</code> n'est pas encore bilingue.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Piège courant</div>
+    <div class="warning">
+      <p>Ne pas confondre migration et seed. Les migrations modifient la <strong>structure</strong> (tables, colonnes, index). Le seed insère des <strong>données</strong>. Les deux fichiers restent séparés et ne se mélangent pas.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title">Ce qu'il faut retenir en une phrase</div>
+    <div class="card">
+      <p>Les migrations sont l'historique Git de ta base de données — chaque fichier est un commit que tu ne réécris jamais, seulement tu en ajoutes de nouveaux.</p>
+    </div>
+  </div>
+</div>
