@@ -1,2 +1,44 @@
 pense bete : 
-La note résume l'essentiel. Un point à ne pas oublier pour la suite : la table education dans ton schéma actuel n'a pas de table de traductions (education_translations). C'est la prochaine migration à créer si tu veux que les intitulés de diplômes soient bilingues — exactement le genre de chose qu'on gère avec un fichier 002_add_education_translations.sql plutôt qu'en touchant au schéma initial.
+Le prompt pour la prochaine fois : 
+[ARCH] + [BACK] Configure next-intl et next-themes, 
+puis crée le client PostgreSQL, les types TypeScript 
+depuis le schéma SQL, et les premières requêtes.
+
+Contexte : voir progress.md et CLAUDE.md à la racine.
+Stack : Next.js 14 App Router, PostgreSQL (Docker local port 5432), 
+Tailwind CSS, src/ structure.
+Niveau : débutante — expliquer le pourquoi de chaque décision.
+
+### Partie 3 — Note de reprise pour demain
+
+Quand tu reviens sur ce projet, fais exactement ça dans cet ordre :
+
+**1. Lis `progress.md`** en premier — il te dit où tu en es et quelle est la prochaine étape sans avoir à te souvenir.
+
+**2. Vérifie que Docker tourne** (ta base de données est dans un container) :
+```bash
+docker ps
+# Tu dois voir ton container postgres dans la liste
+```
+
+**3. Lance le projet** pour vérifier qu'il démarre :
+```bash
+cd portfolio_developpeuse_ia
+npm run dev
+```
+
+**4. Ouvre une nouvelle conversation Claude** avec ce prompt de démarrage :
+```
+[ARCH] + [BACK] je reprends mon portfolio.
+Lis progress.md et CLAUDE.md — la prochaine étape 
+est la configuration de next-intl et next-themes, 
+puis le client PostgreSQL et les types TypeScript.
+```
+
+**Ce que tu vas faire à la prochaine session :**
+- Configurer next-intl pour que `/fr/` et `/en/` fonctionnent
+- Configurer next-themes pour le toggle dark/light
+- Créer la connexion PostgreSQL dans `src/lib/db/client.ts`
+- Écrire les types TypeScript qui correspondent à tes tables SQL
+
+**Le piège à éviter demain :** next-intl nécessite un fichier `middleware.ts` à la racine de `src/` — pas dans `app/`, pas dans `lib/`. C'est une erreur très fréquente qui fait que les redirections de locale ne fonctionnent pas.
