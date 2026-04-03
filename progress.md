@@ -74,6 +74,10 @@ Ordre exact :
 - migrations/ pour le schéma versionné, scripts/ pour seed et reset
 - node-pg-migrate pour les migrations futures
 - sharp en devDependencies maintenant → à corriger en dependencies à la phase Docker
+- Images de projets et media exclues de Git (.gitignore)
+  → public/images/projects/ et public/images/media/ non trackées
+  → Images de design (clouds, stars, aureole) restent dans Git car liées au code front
+- Compression images de design : à faire lors du codage du composant Hero, pas avant
 
 ### Architecture du projet
 portfolio_developpeuse_ia/  
